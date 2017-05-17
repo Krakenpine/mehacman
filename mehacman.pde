@@ -20,6 +20,7 @@ float animation = 0;
 float animationSpeed = 32;
 boolean animationDirection = true;
 int deaths = 0;
+boolean endTextHasBeenDone = false; //do some better solution for this
 
 void setup(){
   size(1024, 1024, P3D); //put size here manually because Processing
@@ -45,22 +46,22 @@ void draw(){
  
  player.move();
  
- monster1.tekoAlyttomyys();
- monster2.tekoAlyttomyys();
- monster3.tekoAlyttomyys();
- monster4.tekoAlyttomyys();
+ monster1.artificialUnintelligence();
+ monster2.artificialUnintelligence();
+ monster3.artificialUnintelligence();
+ monster4.artificialUnintelligence();
  
- labyrinth.piirra(player); 
- player.piirra();
- monster1.piirra();
- monster2.piirra();
- monster3.piirra();
- monster4.piirra();
+ labyrinth.graphics(player); 
+ player.graphics();
+ monster1.graphics();
+ monster2.graphics();
+ monster3.graphics();
+ monster4.graphics();
  
- tormaysTesti(player.getxScreenCordinate(), player.getyScreenCordinate(), monster1.getxScreenCordinate(), monster1.getyScreenCordinate());
- tormaysTesti(player.getxScreenCordinate(), player.getyScreenCordinate(), monster2.getxScreenCordinate(), monster2.getyScreenCordinate());
- tormaysTesti(player.getxScreenCordinate(), player.getyScreenCordinate(), monster3.getxScreenCordinate(), monster3.getyScreenCordinate());
- tormaysTesti(player.getxScreenCordinate(), player.getyScreenCordinate(), monster4.getxScreenCordinate(), monster4.getyScreenCordinate());
+ collisionCheck(player.getxScreenCordinate(), player.getyScreenCordinate(), monster1.getxScreenCordinate(), monster1.getyScreenCordinate(), monster1);
+ collisionCheck(player.getxScreenCordinate(), player.getyScreenCordinate(), monster2.getxScreenCordinate(), monster2.getyScreenCordinate(), monster2);
+ collisionCheck(player.getxScreenCordinate(), player.getyScreenCordinate(), monster3.getxScreenCordinate(), monster3.getyScreenCordinate(), monster3);
+ collisionCheck(player.getxScreenCordinate(), player.getyScreenCordinate(), monster4.getxScreenCordinate(), monster4.getyScreenCordinate(), monster4);
  
  eating();
 
@@ -75,7 +76,10 @@ void draw(){
    translate(0, 0, 10);
    fill(255);
    textSize(200);
-   text("DEAD", 20, size/2);
+   if (!endTextHasBeenDone) {
+     text("DEAD", 20, size/2);
+     endTextHasBeenDone = true;
+   }
    translate(0, 0, -10);
  }
   
@@ -103,7 +107,7 @@ void controllerInput(){
 }
 
 
-void tormaysTesti(float x1, float y1, float x2, float y2) {
+void collisionCheck(float x1, float y1, float x2, float y2, Monster monster) {
   /*translate(0,0,1);
   strokeWeight(4);
   fill(255,120,120);
@@ -111,16 +115,28 @@ void tormaysTesti(float x1, float y1, float x2, float y2) {
   point(x2,y2);
   strokeWeight(1);
   translate(0,0,-1);*/
+  
   if(sqrt(pow(x1-x2,2) + pow(y1-y2,2)) < piece/1.3) {
-    println("kuoli pois");
-    alive = false;
+    if (!player.getPowerMode()) {
+      println("kuoli pois");
+      alive = false;
+    } else {
+        monster.kill();
+        println("eated monster");
+    }
   }
 }
 
 void eating() {
-  if (labyrinth.mitaKohdassa(player.getxKoordinaatti(), player.getyKoordinaatti()) == 2) {
-    points++;
-    labyrinth.asetaKohta(player.getxKoordinaatti(), player.getyKoordinaatti(), 0);
+  if (labyrinth.mitaKohdassa(player.getxCoordinate(), player.getyCoordinate()) == 2) {
+    points += 10;
+    labyrinth.asetaKohta(player.getxCoordinate(), player.getyCoordinate(), 0);
+  } else if (labyrinth.mitaKohdassa(player.getxCoordinate(), player.getyCoordinate()) == 4) {
+    player.powerModeOn();
+    labyrinth.asetaKohta(player.getxCoordinate(), player.getyCoordinate(), 0);
+    player.ateMonster();
+    points += player.getMonstersEatenThisPowerMode() *200;
+    if (player.getMonstersEatenThisPowerMode() == 4) { points += 12000; }
   }
   
   
