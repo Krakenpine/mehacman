@@ -5,36 +5,38 @@ class Monster {
   int y;
   int xTarget;
   int yTarget;
-  boolean hasTavoite = false;
+  boolean hasTarget = false;
   int direction; //0=seis, 1=ylös, 2=oikealle, 3=alas, 4=vasemmalle
-  int haluttuSuunta = 0; //0=seis, 1=ylös, 2=oikealle, 3=alas, 4=vasemmalle
-  int tavoitteenSuunta = 0;
+  int wantedDirection = 0; //0=seis, 1=ylös, 2=oikealle, 3=alas, 4=vasemmalle
+  int targetDirection = 0;
   int previousDirection = 0;
   Labyrinth labyrinth;
-  boolean liikkuu = false;
+  boolean isMoving = false;
   float subTilePosition = 0;
   Player player;
   int type;
   Monster buddy;
   boolean panicMode = false;
+  boolean hasBeenEated;
   
-  Monster(float xKoordinaatti, float yKoordinaatti, int alkuTavoiteX, int alkuTavoiteY, Labyrinth labyrinth, Player player, int type){
-    this.xDraw = xKoordinaatti * piece;
-    this.yDraw = yKoordinaatti * piece;
-    this.x = int(xKoordinaatti);
-    this.y = int(yKoordinaatti);
+  Monster(float xCoordinate, float yCoordinate, int alkuTavoiteX, int alkuTavoiteY, Labyrinth labyrinth, Player player, int type){
+    this.xDraw = xCoordinate * piece;
+    this.yDraw = yCoordinate * piece;
+    this.x = int(xCoordinate);
+    this.y = int(yCoordinate);
     this.xTarget = alkuTavoiteX;
     this.yTarget = alkuTavoiteY;
     this.labyrinth = labyrinth;
     this.player = player;
     this.type = type;
+    this.hasBeenEated = false;
   }
   
-  Monster(float xKoordinaatti, float yKoordinaatti, int alkuTavoiteX, int alkuTavoiteY, Labyrinth labyrinth, Player player, int type, Monster buddy){
-    this.xDraw = xKoordinaatti * piece;
-    this.yDraw = yKoordinaatti * piece;
-    this.x = int(xKoordinaatti);
-    this.y = int(yKoordinaatti);
+  Monster(float xCoordinate, float yCoordinate, int alkuTavoiteX, int alkuTavoiteY, Labyrinth labyrinth, Player player, int type, Monster buddy){
+    this.xDraw = xCoordinate * piece;
+    this.yDraw = yCoordinate * piece;
+    this.x = int(xCoordinate);
+    this.y = int(yCoordinate);
     this.xTarget = alkuTavoiteX;
     this.yTarget = alkuTavoiteY;
     this.labyrinth = labyrinth;
@@ -58,7 +60,7 @@ class Monster {
     if (this.type == 2) { fill(0,0,180); }
     if (this.type == 3) { fill(0,255,0); }
     if (this.type == 4) { fill(120,0,120); }
-    if (this.player.getPowerMode()) { fill(150,150,255); } 
+    if (this.player.getPowerMode() && !this.hasBeenEated) { fill(150,150,255); }
     
    if (threeD) {
       translate(this.x*piece+piece+directionAddX, this.y*piece+directionAddY, this.type);
@@ -91,8 +93,9 @@ class Monster {
   }
   
   void artificialUnintelligence() {
-    if (this.player.getPowerMode()) { this.panicMode = true; }
+    if (this.player.getPowerMode() && !this.hasBeenEated) { this.panicMode = true; }
     else { this.panicMode = false; }
+    if (!this.player.getPowerMode()) { this.hasBeenEated = false; }
     
     
     if (this.type == 1) {
@@ -136,7 +139,7 @@ class Monster {
     }
             
     
-    if (!this.liikkuu) {
+    if (!this.isMoving) {
       float etaisyysTavoitteeseenYlapuolelta = sqrt(pow((this.x-this.xTarget),2) + pow((this.y-1-this.yTarget),2));
       float etaisyysTavoitteeseenVasemmalta = sqrt(pow((this.x-1-this.xTarget),2) + pow((this.y-this.yTarget),2));
       float etaisyysTavoitteeseenAlapuolelta = sqrt(pow((this.x-this.xTarget),2) + pow((this.y+1-this.yTarget),2));
@@ -149,16 +152,16 @@ class Monster {
     
       float[] etaisyydet = {etaisyysTavoitteeseenYlapuolelta, etaisyysTavoitteeseenVasemmalta, etaisyysTavoitteeseenAlapuolelta, etaisyysTavoitteeseenOikealta};
       
-      float pieninEtaisyys = min(etaisyydet);
+      float smallestDistance = min(etaisyydet);
       
-      if (pieninEtaisyys == etaisyysTavoitteeseenYlapuolelta) { this.direction = 1; this.previousDirection = 1; }
-      if (pieninEtaisyys == etaisyysTavoitteeseenVasemmalta) { this.direction = 4; this.previousDirection = 4;}
-      if (pieninEtaisyys == etaisyysTavoitteeseenAlapuolelta) { this.direction = 3; this.previousDirection = 3;}
-      if (pieninEtaisyys == etaisyysTavoitteeseenOikealta) { this.direction = 2; this.previousDirection = 2;}
+      if (smallestDistance == etaisyysTavoitteeseenYlapuolelta) { this.direction = 1; this.previousDirection = 1; }
+      if (smallestDistance == etaisyysTavoitteeseenVasemmalta) { this.direction = 4; this.previousDirection = 4;}
+      if (smallestDistance == etaisyysTavoitteeseenAlapuolelta) { this.direction = 3; this.previousDirection = 3;}
+      if (smallestDistance == etaisyysTavoitteeseenOikealta) { this.direction = 2; this.previousDirection = 2;}
       if (this.labyrinth.mitaKohdassa(this.x, this.y) == 5) { this.direction = 1; this.previousDirection = 1; }   //get them out of the middle box
       if (this.labyrinth.mitaKohdassa(this.x, this.y) == 6) { this.direction = 2; this.previousDirection = 2; }
       if (this.labyrinth.mitaKohdassa(this.x, this.y) == 7) { this.direction = 4; this.previousDirection = 4; }
-      this.liikkuu = true;
+      this.isMoving = true;
       
 
     }
@@ -171,7 +174,7 @@ class Monster {
           if (this.direction == 3) { this.y++; }
           if (this.direction == 4) { this.x--; }
           subTilePosition = 0;
-          this.liikkuu = false;
+          this.isMoving = false;
           this.direction = 0;
         }
     if (this.x <= 6) { this.x = 23; } //teleport left
@@ -209,10 +212,14 @@ class Monster {
   }
   
   void kill() {
+    this.hasBeenEated = true;
     if (this.type == 1) { reset(15, 15); }
     if (this.type == 2) { reset(14, 16); }
     if (this.type == 3) { reset(15, 16); }
     if (this.type == 4) { reset(16, 16); }
-    
+  }
+  
+  boolean getPanicMode() {
+    return this.panicMode;
   }
 }

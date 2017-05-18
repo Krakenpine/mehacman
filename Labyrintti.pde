@@ -61,7 +61,20 @@ class Labyrinth {
        
        if (this.kentta[kohta] == 1) {
          fill(0,0,255);
-         if (!threeD) {rect(xIt*piece, yIt*piece, piece, piece); }
+         if (!threeD) {  // in 2D mode
+           fill(0,0,200);
+           rect(xIt*piece, yIt*piece, piece, piece); 
+           fill(0,0,255);
+           rect(xIt*piece+piece/5, yIt*piece+piece/5, piece-(piece*2)/5, piece-(piece*2)/5);
+           fill(100,100,255);
+           quad(xIt*piece, yIt*piece, xIt*piece+piece, yIt*piece, xIt*piece+(piece*4)/5, yIt*piece+(piece)/5, xIt*piece+piece/5, yIt*piece+piece/5);
+           quad(xIt*piece+piece, yIt*piece+piece, xIt*piece+(piece*4)/5, yIt*piece+(piece*4)/5, xIt*piece+(piece*4)/5, yIt*piece+(piece)/5, xIt*piece+piece, yIt*piece);
+           //line(xIt*piece,yIt*piece,xIt*piece+piece/5, yIt*piece+piece/5);
+           //line(xIt*piece+piece,yIt*piece,xIt*piece+(piece*4)/5, yIt*piece+piece/5);
+           line(xIt*piece,yIt*piece+piece,xIt*piece+piece/5, yIt*piece+(piece*4)/5);
+           //line(xIt*piece+piece,yIt*piece+piece,xIt*piece+(piece*4)/5, yIt*piece+(piece*4)/5);
+           
+         }
          if (threeD) { translate(piece, 0, 0); }
          if (threeD) {box((piece/4)*3); }
        } else if (this.kentta[kohta] == 2) {

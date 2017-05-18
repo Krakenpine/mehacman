@@ -45,23 +45,45 @@ class Player {
       //ellipse(this.x*piece+(piece/2) + directionAddX, this.y*piece+(piece/2) + directionAddY, piece, piece);
       translate(pX+piece/2, pY+piece/2, 0);
       if( previousDirection == 1) { rotate(PI/2); }
-      if( previousDirection == 2) { rotate(PI); }
+      //if( previousDirection == 2) { rotate(PI); }
       if( previousDirection == 3) { rotate(3*(PI/2)); }
 
+      shapeMode(CENTER);
+       if( previousDirection == 2) { scale(-1,1); } //oikealle
+       shape(pelaajaAnimaatio[animaatioCounter], 0, 0, piece, piece);
+       if( previousDirection == 2) { scale(-1,1); } //oikealle
+       if (animaatioSuunta && direction != 0) {
+         animaatioCounter++;
+         if (animaatioCounter >=30) {
+           animaatioCounter = 29;
+           animaatioSuunta = false;
+         }
+       } else if (direction != 0) {
+         animaatioCounter--;
+         if (animaatioCounter < 0) {
+           animaatioCounter = 0;
+           animaatioSuunta = true;
+         }
+       }
+      
+      
+      /*
       beginShape();
       vertex(p8*anim-piece/2, p4 -p16 + (p4+p8)*anim -piece/2);
       bezierVertex(piece-piece/2, -3*p4-piece/2, 6*p4-piece/2, 7*p4-piece/2, p8*anim-piece/2, 3*p4+p16-p4*anim-piece/2);
       bezierVertex(piece - p2*anim-piece/2, 3*p4-piece/2, p2-piece/2, p4-piece/2, p8*anim-piece/2, p4 -p16 + (p4+p8)*anim-piece/2);
-      endShape();
+      endShape();*/
       if( previousDirection == 1) { rotate(-PI/2); }
-      if( previousDirection == 2) { rotate(-PI); }
+      //if( previousDirection == 2) { rotate(-PI); } //oikealle
       if( previousDirection == 3) { rotate(-3*(PI/2)); }
       translate(-pX-piece/2, -pY-piece/2, 0);
+      
+      /*
       if (direction != 0) {
         if (animationDirection) { animation += animationSpeed; } else { animation -= animationSpeed; }
       }
       if (animation < 0) { animation = 0; animationDirection = true; }
-      if (animation > 1000) { animation = 1000; animationDirection = false; }
+      if (animation > 1000) { animation = 1000; animationDirection = false; }*/
       
     }
 
